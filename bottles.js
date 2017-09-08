@@ -1,55 +1,43 @@
-function bottles (investment) {
-  let bottles = {
-    calculate: function(){
-      this.bought = Math.floor(investment /2)
-      this.earnedEmpty = Math.floor(this.bought /2)
-      this.earnedCaps = Math.floor(this.bought /4)
-      this.emptiesLeft = this.bought % 2
-      this.capsLeft = this.bought % 4
-      
-      return
-    },
-    recursive: function () {
-      console.log(this)
-      let newEmpties = (this.earnedEmpty + this.emptiesLeft + this.earnedCaps)
-      let newCaps = (this.earnedEmpty + this.capsLeft + this.earnedCaps)
-      e = 0,
-      c = 0
+const input = process.argv[2]
+const emptyRedeem = ['empty', 'earnedFromEmpties', 2, 'caps']
+const capsRedeem = ['caps', 'earnedFromCaps', 4, 'empty']
 
-      while (newEmpties >= 2 || newCaps >= 4) {
-        let newBottles = 0
-        if (newEmpties >= 2) {
-          e = Math.floor(newEmpties / 2)
-          this.earnedEmpty += e
-          this.emptiesLeft = newEmpties % 2
-          newBottles += e
-        }
-        if (newCaps >= 4) {
-          c = Math.floor(newCaps / 4)
-          this.earnedCaps += c
-          this.capsLeft = newCaps % 4
-          newBottles += c
-        }
-        newEmpties = newBottles + this.emptiesLeft
-        newCaps = newBottles + this.capsLeft
+let bottle = {
+  bought: 0,
+  earnedFromEmpties: 0,
+  earnedFromCaps: 0,
+  calcBottles: function (investment) {
+    this.bought = Math.floor(investment / 2)
+    this.total = Math.floor(investment / 2)
+    this.caps = this.bought
+    this.empty = this.bought
+    // console.log(bottle)
+    while (this.caps >= 4 || this.empty >= 2) {
+      if (this.empty >= 2){
+        this.Redeem(emptyRedeem)
       }
-    
-      this.total = this.bought + this.earnedEmpty + this.earnedCaps
-      return
+      if (this.caps >= 4){
+        this.Redeem(capsRedeem)
+      }
     }
+    return bottle
+  },
+  Redeem: function (array) {
+    // console.log(array)
+    e = Math.floor(this[array[0]] / array[2])
+    // console.log(e)
+    this[array[1]] += e
+    this[array[3]] += e
+    this[array[0]] = e
+    this.total += e
+    // console.log(bottle)
+    return
   }
-  
-  bottles.calculate(investment)
-  bottles.recursive()
-  // calculate recursive returns
-  // console.log(bottles)
-  return bottles
 }
 
-const input = process.argv[2]
 
-var outputBottles = bottles(input)
-// console.log(outputBottles)
-console.log('TOTAL BOTTLES: ' + outputBottles.total + '\nTOTAL BOUGHT: ' + outputBottles.bought + '\nTOTAL EARNED VIA:\n\ \ EMPTIES: ' + outputBottles.earnedEmpty + '\n\ \ CAPS:\ \ \ ' + outputBottles.earnedCaps + '\nWith ' + outputBottles.emptiesLeft + ' empties and ' + outputBottles.capsLeft + ' caps left')
 
-module.exports = bottles
+const answer = bottle.calcBottles(input)
+console.log(answer.total + ' bottles total: ')
+console.log(answer.bought + ' purchased, ' + answer.earnedFromEmpties + ' earned from empties, ' + answer.earnedFromCaps + ' earned from caps.')
+console.log('You have', answer.empty, 'empties and ', answer.caps, 'caps remaining')
